@@ -5,6 +5,13 @@ Created on Mon Dec 24 11:41:55 2018
 @author: sakshij
 """
 
+#==============================================================================
+# Update the following packages:
+#     keras - 2.2.4
+#     tensorflow - 1.10+
+# and then run
+#==============================================================================
+
 import numpy as np
 from tensorflow.python.keras import backend as K
 from tensorflow.python.keras.utils import np_utils
@@ -23,7 +30,7 @@ from sklearn.metrics import confusion_matrix, accuracy_score
 from tensorflow.python.keras.layers import Dropout, Reshape
 from tensorflow.python.keras.layers.core import Activation
 
-from tensorflow.python.keras.models import model_from_json, Model, load_model
+from tensorflow.python.keras.models import model_from_json, Model
 from tensorflow.python.keras.wrappers.scikit_learn import KerasClassifier
 from tensorflow.python.keras.callbacks import LearningRateScheduler
 
@@ -71,7 +78,7 @@ def getUseCaseDataInfo(use_case):
     
 ############################################################################
 #different model architecture based on model numbers
-def read_model(model_num, optimizer, model_path):
+def read_model(model_num, optimizer,model_path):
     os.chdir(model_path)
     file_name = "CNN_" + str(model_num)
     
@@ -88,23 +95,17 @@ def read_model(model_num, optimizer, model_path):
     loaded_model.compile(loss='binary_crossentropy', optimizer=optimizer, metrics=['accuracy'])
     
     return loaded_model
-
+        
 ############################################################################
 #Modelling with grid parameters
 os.getcwd()
 
 grid = {'nesterov': [True, False],
-        'epochs': [50,100],
+        'epochs': [100,200,500],
         'batch_size' : [10,20,30],
-        'learning_rate': [0.001, 0.002, 0.003, 0.01, 0.02, 0.03, 0.1]
+        'learning_rate': [0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.2],
+#        'optimizers': ['adam','adagrad','adadelta','RMSprop']
         }
-
-#old_grid = {'nesterov': [True, False],
-#        'epochs': [100,200,500],
-#        'batch_size' : [10,20,30],
-#        'learning_rate': [0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.2],
-##        'optimizers': ['adam','adagrad','adadelta','RMSprop']
-#        }
 
 #temp_grid = {'nesterov': [True],
 #        'epochs': [20],
@@ -115,19 +116,13 @@ grid = {'nesterov': [True, False],
 
 param_grid = list(ParameterGrid(grid))
 
-os.getcwd()
-
 #Modelling
 data_file_path = "D:\\Projects\\Tableau_Train_Combine\\NN\\Data"
+Insurance_use_cases = ["V1_noClaim","V1_withClaim","V2_noClaim","V2_withClaim"]
 
-#Testing
-Insurance_use_cases = ["V2_noClaim","V2_withClaim"]
-#Insurance_use_cases = ["V1_noClaim","V1_withClaim","V2_noClaim","V2_withClaim"]
-
-use_case = "V1_noClaim"
 for use_case in Insurance_use_cases:
     original_models_path, model_path_pretrained, data_file, no_of_models = getUseCaseDataInfo(use_case)
-#    break    
+    
     #Read Data
     os.chdir(data_file_path)
 
@@ -153,11 +148,7 @@ for use_case in Insurance_use_cases:
     y_train = y_train.values
     y_test = y_test.values
     
-#    for model_num in range(1,no_of_models+1,1):
-    for model_num in range(4,7,1):
-        
-        model_num = 6
-        
+    for model_num in range(1,no_of_models+1,1):
         model_path_pretrained_all = model_path_pretrained + "\\model_" + str(model_num) + "\\grid_all"
         model_path_pretrained_selected = model_path_pretrained + "\\model_" + str(model_num) + "\\grid_selected"
         

@@ -319,27 +319,5 @@ report_df = report(dl_fit6, test, y , model_path_63, num_layers, report_df,
               model_name, defined_params, file_name, training_ratio, 
               threshold=threshold, sampling=None, model_type='basic')
 
-path = "D:\\Projects\\Tableau_Train_Combine\\NN\\Models\\V2_withClaim_predictRenewal_63"
-os.chdir(path)
-os.getcwd()
-
-names_list = ["dl_fit1","dl_fit2","dl_fit3","dl_fit4","dl_fit5","dl_fit6"]
-num_layers = [2,3,4,4,6,8]
-thresholds = [0.64 ,0.68 ,0.71 ,0.7 ,0.67 ,0.79]
-
-for index in range(len(names_list)):
-    model = h2o.load_model(path + "\\" + names_list[index])
-    num_layer = num_layers[index]
-    threshold = thresholds[index]
-    
-    model_name = "MLP - Feedforward"
-    defined_params = ""
-    file_name = "NN_" + str(index+1)
-    training_ratio = 0.65
-    
-    report_df = report(model, test, y , model_path_63, num_layers, report_df, 
-              model_name, defined_params, file_name, training_ratio, 
-              threshold=threshold, sampling=None, model_type='basic',
-              store_model_perf = False, store_model=False, store_model_weights = False)
-    
-report_df.to_csv("Report_NN_V2_withClaim_predictRenewal_63cols_1.csv",index=False)
+######################################################################
+#NN Grid

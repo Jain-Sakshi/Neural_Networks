@@ -38,31 +38,31 @@ import pickle
 os.chdir("D:\\Projects\\Tableau_Train_Combine\\NN\\Codes")
 from Plot_Metrics import plotMetricsWithThreshold
 from Report_CNN import saveModelandModelInfo
-from Filter_Thresholds import combineModelReports, filterThresholds
+
 ############################################################################
 def getUseCaseDataInfo(use_case):
     if use_case == "V1_noClaim":
         original_models_path = "D:\\Projects\\Tableau_Train_Combine\\NN\\Models\\V1_noClaim_predictRenewal"
         model_path_pretrained = original_models_path + "\\grid"
-        data_file = "V1_NoClaim_RenewalPredict_Data.csv"
+        data_file = "V1_NoClaim_RenewalPredict_Data"
         no_of_models = 6
         
     elif use_case == "V1_withClaim":
         original_models_path = "D:\\Projects\\Tableau_Train_Combine\\NN\\Models\\V1_withClaim_predictRenewal"
         model_path_pretrained = original_models_path + "\\grid"
-        data_file = "V1_WithClaim_RenewalPredict_Data.csv"
+        data_file = "V1_WithClaim_RenewalPredict_Data"
         no_of_models = 6
         
     elif use_case == "V2_noClaim":
         original_models_path = "D:\\Projects\\Tableau_Train_Combine\\NN\\Models\\V2_noClaim_predictRenewal"
         model_path_pretrained = original_models_path + "\\grid"
-        data_file = "V2_NoClaim_RenewalPredict_Data.csv"
+        data_file = "V2_NoClaim_RenewalPredict_Data"
         no_of_models = 10
         
     elif use_case == "V2_withClaim":
         original_models_path = "D:\\Projects\\Tableau_Train_Combine\\NN\\Models\\V2_withClaim_predictRenewal_63"
         model_path_pretrained = original_models_path + "\\grid"
-        data_file = "V2_WithClaim_RenewalPredict_Data_63.csv"
+        data_file = "V2_WithClaim_RenewalPredict_Data_63"
         no_of_models = 10
     
     else:
@@ -71,31 +71,6 @@ def getUseCaseDataInfo(use_case):
     return original_models_path, model_path_pretrained, data_file, no_of_models
 
 ############################################################################
-#read an already trained model
-def read_model(model_arch_num,model_num,model_path):
-    os.chdir(model_path)
-    file_name = "Model_" + str(model_arch_num) + "_" + str(model_num)
-    
-    # load json and create model
-    json_file = open(file_name + ".json", "r")
-    loaded_model_json = json_file.read()
-    json_file.close()
-    loaded_model = model_from_json(loaded_model_json)
-    
-    # load weights into new model
-    loaded_model.load_weights(file_name + ".h5")
-#    print("Loaded model from disk")
-    print(str(model_arch_num) + " - " +str(model_num))
-    
-    return loaded_model 
-
-def getMaxAccuracy(file_name):
-    plot_info_file = pd.read_csv(file_name)
-    max_accuracy_value = max(plot_info_file['accuracy'])
-    
-    return max_accuracy_value
-
-########################################################################
 #getting initial learning rate
 def storeParameters(params):
     with open('last_grid_params.pickle', 'wb') as handle:
@@ -360,11 +335,18 @@ def create_model(use_case,model_num,optimizer,dropout=False,metric=['accuracy'])
             print("Wrong model num : architecture not defined")
             
     elif use_case == "V1_withClaim" or use_case == "V1_noClaim":
+        if use_case == "V1_withClaim":
+            input_dim = 97
+        elif use_case == "V1_noClaim":
+            input_dim = 55
+        else:
+            print("Error - Incorrect data")
+            
         if model_num == 1:
             model_1 = Sequential()
 
             #Convolutional Layers
-            model_1.add(Reshape((97, 1), input_shape=(97,)))
+            model_1.add(Reshape((input_dim, 1), input_shape=(input_dim,)))
             model_1.add(Conv1D(20, kernel_size=5, strides=5, padding="same", activation = 'relu'))
             
             #Dense Layers
@@ -385,7 +367,7 @@ def create_model(use_case,model_num,optimizer,dropout=False,metric=['accuracy'])
             model_2 = Sequential()
 
             #Convolutional Layers
-            model_2.add(Reshape((97, 1), input_shape=(97,)))
+            model_2.add(Reshape((input_dim, 1), input_shape=(input_dim,)))
             model_2.add(Conv1D(48, kernel_size=3, strides=2, padding="same", activation = 'relu'))
             model_2.add(Conv1D(20, kernel_size=2, strides=2, padding="same", activation = 'relu'))
             
@@ -407,7 +389,7 @@ def create_model(use_case,model_num,optimizer,dropout=False,metric=['accuracy'])
             model_3 = Sequential()
 
             #Convolutional Layers
-            model_3.add(Reshape((97, 1), input_shape=(97,)))
+            model_3.add(Reshape((input_dim, 1), input_shape=(input_dim,)))
             model_3.add(Conv1D(48, kernel_size=2, strides=2, padding="same", activation = 'relu'))
             model_3.add(Conv1D(40, kernel_size=8, strides=1, padding="same", activation = 'relu'))
             model_3.add(Conv1D(20, kernel_size=2, strides=2, padding="same", activation = 'relu'))
@@ -430,7 +412,7 @@ def create_model(use_case,model_num,optimizer,dropout=False,metric=['accuracy'])
             model_4 = Sequential()
 
             #Convolutional Layers
-            model_4.add(Reshape((97, 1), input_shape=(97,)))
+            model_4.add(Reshape((input_dim, 1), input_shape=(input_dim,)))
             model_4.add(Conv1D(25, kernel_size=4, strides=4, padding="same", activation = 'relu'))
             
             #Dense Layers
@@ -451,7 +433,7 @@ def create_model(use_case,model_num,optimizer,dropout=False,metric=['accuracy'])
             model_5 = Sequential()
 
             #Convolutional Layers
-            model_5.add(Reshape((97, 1), input_shape=(97,)))
+            model_5.add(Reshape((input_dim, 1), input_shape=(input_dim,)))
             model_5.add(Conv1D(33, kernel_size=3, strides=3, padding="same", activation = 'relu'))
             model_5.add(Conv1D(20, kernel_size=14, strides=1, padding="same", activation = 'relu'))
             
@@ -473,7 +455,7 @@ def create_model(use_case,model_num,optimizer,dropout=False,metric=['accuracy'])
             model_6 = Sequential()
 
             #Convolutional Layers
-            model_6.add(Reshape((97, 1), input_shape=(97,)))
+            model_6.add(Reshape((input_dim, 1), input_shape=(input_dim,)))
             model_6.add(Conv1D(48, kernel_size=2, strides=2, padding="same", activation = 'relu'))
             model_6.add(Conv1D(40, kernel_size=8, strides=1, padding="same", activation = 'relu'))
             model_6.add(Conv1D(20, kernel_size=2, strides=2, padding="same", activation = 'relu'))
@@ -499,28 +481,20 @@ def create_model(use_case,model_num,optimizer,dropout=False,metric=['accuracy'])
     else:
         print("Wrong Use case!")
     
+   
 ############################################################################
 #Modelling with grid parameters
 os.getcwd()
 
 grid = {'nesterov': [True],
         'batch_size': [20,30],
-        'epochs': [20,50,100,150],
-        'learning_rate': [0.1, 0.2, 0.3],
-        'momentum': [0.5,0.65,0.8],
+        'epochs': [100,200,500],
+        'learning_rate': [0.1, 0.2, 0.3, 0.4],
+        'momentum': [0.5,0.6,0.7,0.8],
         'decay': ['decay','step','exponential'],
-        'dropout' : [False, 0.25]
+        'dropout' : [False, 0.2, 0.3]
+#        'optimizers': ['adam','adagrad','adadelta','RMSprop']
         }
-
-#grid = {'nesterov': [True],
-#        'batch_size': [20,30],
-#        'epochs': [100,200,500],
-#        'learning_rate': [0.1, 0.2, 0.3, 0.4],
-#        'momentum': [0.5,0.6,0.7,0.8],
-#        'decay': ['decay','step','exponential'],
-#        'dropout' : [False, 0.2, 0.3]
-##        'optimizers': ['adam','adagrad','adadelta','RMSprop']
-#        }
 
 param_grid = list(ParameterGrid(grid))
 
@@ -528,14 +502,13 @@ param_grid = list(ParameterGrid(grid))
 data_file_path = "D:\\Projects\\Tableau_Train_Combine\\NN\\Data"
 Insurance_use_cases = ["V1_noClaim","V1_withClaim","V2_noClaim","V2_withClaim"]
 
-use_case = "V1_noClaim"
 for use_case in Insurance_use_cases:
     original_models_path, model_path_grid, data_file, no_of_models = getUseCaseDataInfo(use_case)
     
     #Read Data
     os.chdir(data_file_path)
 
-    full_data = pd.read_csv(data_file)
+    full_data = pd.read_csv(data_file + ".csv")
     
     data_0 = full_data.copy(deep=True)
     data_0_columns = data_0.columns.tolist()
@@ -557,9 +530,7 @@ for use_case in Insurance_use_cases:
     y_train = y_train.values
     y_test = y_test.values
     
-    model_num = 6
-#    for model_num in range(1,no_of_models+1,1):
-    for model_num in range(5,no_of_models+1,1):
+    for model_num in range(1,no_of_models+1,1):
         model_path_grid_all = model_path_grid + "\\model_" + str(model_num) + "\\grid_all"
         model_path_grid_selected = model_path_grid + "\\model_" + str(model_num) + "\\grid_selected"
         
@@ -568,18 +539,7 @@ for use_case in Insurance_use_cases:
         models_grid = []
         max_accuracy_all_grid = []
         
-        num_models_already_created = 87
-        for read_models_index in range(0,num_models_already_created,1):
-            model = read_model(model_num, read_models_index, model_path_grid_all)
-            plot_info_file_name = "Model_" + str(model_num) + "_" + str(read_models_index) + "_all_plot_info.csv"
-            model_max_accuracy = getMaxAccuracy(plot_info_file_name)
-            
-            models_grid.append(model)
-            max_accuracy_all_grid.append(model_max_accuracy)
-
-#        num_models_already_created = 0
-        
-        for index in range(num_models_already_created,len(param_grid)):
+        for index in range(len(param_grid)):
             params = param_grid[index]
             storeParameters(params)
         
@@ -618,7 +578,7 @@ for use_case in Insurance_use_cases:
                 optimizer = keras.optimizers.SGD(lr=learning_rate, momentum=momentum, decay=0.0, nesterov=nesterov)
                 
                 #create, compile and append model to list
-                model = create_model(use_case, model_num,optimizer,dropout)
+                model = create_model(model_num,optimizer,dropout)
                 models_grid.append(model)
                 
                 # learning schedule callback
@@ -645,7 +605,7 @@ for use_case in Insurance_use_cases:
                 optimizer = keras.optimizers.SGD(lr=learning_rate, momentum=momentum, decay=0.0, nesterov=nesterov)
                 
                 #create, compile and append model to list
-                model = create_model(use_case, model_num,optimizer,dropout)
+                model = create_model(model_num,optimizer,dropout)
                 models_grid.append(model)
                 
                 # learning schedule callback
@@ -696,59 +656,3 @@ for use_case in Insurance_use_cases:
             threshold_metrics_info.to_csv(new_file_name + ".csv", index=False)
             saveModelandModelInfo(models_grid[model_index], new_file_name, model_path_grid_selected)
             
-#################################################################
-
-# =============================================================================
-# use_case = "V2_noClaim"
-# original_models_path, model_path_grid, data_file, no_of_models = getUseCaseDataInfo(use_case)
-# 
-# for arch_num in range(1,no_of_models+1):
-#     models_path = model_path_grid + "\\model_" + str(arch_num) + "\\grid_selected"
-#     threshold_files_path = models_path + "\\Threshold"
-#     
-#     for root,dirs,files in os.walk(models_path):
-#         for file_name in files:
-#            if file_name.endswith(".csv"):
-#                report_file = pd.read_csv(root + "\\" + file_name)
-#                
-#                file_name = file_name[0:-4]
-#                threshold_file_name = file_name + "_threshold" 
-#                 
-#                filterThresholds(file_name, models_path, 
-#                threshold_file_name, threshold_files_path,
-#                save_separate_files = True,
-#                accuracy_filter = 0.6, precision_filter = 0.75, recall_filter = 0.75, 
-#                TPR_filter = 0.6, FPR_filter = None, TNR_filter = 0.6,
-#                fpoint5score_filter = None, f1score_filter = [0.5,0.5], f2score_filter = None,
-#                precision_class = "majority", recall_class = "minority",
-#                fpoint5score_class = None, f1score_class = "both", f2score_class = None
-#                )
-#     print(arch_num)
-# 
-# =============================================================================
-
-# =============================================================================
-# combineModelReports(original_models_path, "grid",
-#                         "V2_noClaim_CNN_Report_1", original_models_path,
-#                         no_of_models)
-# 
-# =============================================================================
-
-
-
-
-
-
-# =============================================================================
-# filter_val
-# filterThresholds(file_name, models_path, 
-#                  threshold_file_name, threshold_files_path,
-#                  save_separate_files = True,
-#                  accuracy_filter = 0.7, precision_filter = 0.75, recall_filter = 0.75, 
-#                  TPR_filter = 0.6, FPR_filter = None, TNR_filter = 0.6,
-#                  fpoint5score_filter = None, f1score_filter = 0.5, f2score_filter = None,
-#                  precision_class = "majority", recall_class = "minority",
-#                  fpoint5score_class = None, f1score_class = "both", f2score_class = None
-#                  )
-# 
-# =============================================================================

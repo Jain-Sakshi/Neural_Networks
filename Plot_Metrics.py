@@ -5,6 +5,9 @@ Created on Sat Dec 15 13:52:27 2018
 @author: sakshij
 """
 
+#To change - specify colors for different metrics so that one 
+#doesn't get confused with another
+
 import matplotlib.pyplot as plt
 from sklearn.metrics import precision_score, recall_score, confusion_matrix, accuracy_score, fbeta_score
 import numpy as np
@@ -467,6 +470,3 @@ def plotMetricsWithThreshold(model, X_test, y_test, fig_name=None, fig_path = No
         return return_info[0]
     else:
         return return_info
-    
-def plotMetricsWithReport(report_file_name, report_file_location):
-    return 1
